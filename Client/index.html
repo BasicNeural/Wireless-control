@@ -1,0 +1,211 @@
+<html>
+<head>
+    <title>WebSocket</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+     
+    <script type="text/javascript">
+    var socket;
+    var ledSend = false;
+    function init() {
+        var host = "ws://ten.iptime.org:9000/testwebsock.php"; // SET THIS TO YOUR SERVER
+         
+        try
+        {
+            socket = new WebSocket(host);
+             
+            socket.onopen = function(msg) 
+            { 
+                if(this.readyState == 1)
+                {
+                    setInterval("send()", 500);
+
+                }
+            };
+            //Message received from websocket server
+            socket.onmessage = function(msg) 
+            { 
+                //document.write(msg.data + "C");
+                ctx.clearRect(0, 0, 800, 600);
+                ctx.fillText(msg.data + "°C", 10, 60);
+            };
+             
+            //Connection closed
+            socket.onclose = function(msg) 
+            { 
+                document.write("Disconnected - status " + this.readyState); 
+            };
+             
+            socket.onerror = function()
+            {
+                document.write("Some error");
+            }
+            var canvas;
+            var ctx;
+            canvas = document.getElementById("canvas");
+            ctx = canvas.getContext("2d");
+            ctx.font = "60px Gothic";
+        }
+         
+        catch(ex)
+        { 
+            document.write('Some exception : '  + ex); 
+        }
+         
+        $("msg").focus();
+    }
+    function send()
+    {
+        if (ledSend)
+            socket.send("1");
+        else
+            socket.send("0");
+    }
+ 
+    // Utilities
+    function $(id)
+    { 
+        return document.getElementById(id); 
+    }
+     
+    function onkey(event)
+    { 
+        if(event.keyCode==13)
+        { 
+            send(); 
+        } 
+    }    
+
+    function test(){
+        var chk = document.chkbox;
+        for (i=0;i<chk.length;i++) {
+            if (chk[i].checked == true)
+                ledSend = true;
+            else
+                ledSend = false;
+        }
+    }
+    </script>
+ 
+</head>
+ 
+<style type="text/css">
+    .switch {
+    width: 180px;
+    height: 50px;
+    position: relative;
+}
+    .switch label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #a5a39d;
+    border-radius: 40px;
+    box-shadow:
+        inset 0 3px 8px 1px rgba(0,0,0,0.2),
+        0 1px 0 rgba(255,255,255,0.5);
+}
+    .switch label:after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -8px; right: -8px; bottom: -8px; left: -8px;
+    border-radius: inherit;
+    background: #ccc; /* Fallback */
+    background: linear-gradient(#f2f2f2, #ababab);
+    box-shadow: 0 0 10px rgba(0,0,0,0.3),
+        0 1px 1px rgba(0,0,0,0.25);
+}
+    .switch label:before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    top: -18px; right: -18px; bottom: -18px; left: -18px;
+    border-radius: inherit;
+    background: #eee; /* Fallback */
+    background: linear-gradient(#e5e7e6, #eee);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.5);
+    -webkit-filter: blur(1px); /* Smooth trick */
+    filter: blur(1px); /* Future-proof */
+}
+    .switch label i {
+    display: block;
+    height: 100%;
+    width: 60%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;
+    border-radius: inherit;
+    background: #b2ac9e; /* Fallback */
+    background: linear-gradient(#f7f2f6, #b2ac9e);
+    box-shadow:
+        inset 0 1px 0 white,
+        0 0 8px rgba(0,0,0,0.3),
+        0 5px 5px rgba(0,0,0,0.2);
+}
+    .switch label i:after {
+    content: "";
+    position: absolute;
+    left: 15%;
+    top: 25%;
+    width: 70%;
+    height: 50%;
+    background: #d2cbc3; /* Fallback */
+    background: linear-gradient(#cbc7bc, #d2cbc3);
+    border-radius: inherit;
+}
+    .switch label i:before {
+    content: "off";
+    position: absolute;
+    top: 50%;
+    right: -50%;
+    margin-top: -12px;
+    color: #666; /* Fallback */
+    color: rgba(0,0,0,0.4);
+    font-style: normal;
+    font-weight: bold;
+    font-family: Helvetica, Arial, sans-serif;
+    font-size: 24px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 #bcb8ae, 0 -1px 0 #97958e;
+}
+    .switch input:checked ~ label { /* Background */
+    background: #9abb82;
+}
+
+.switch input:checked ~ label i { /* Toggle */
+    left: auto;
+    right: -1%;
+}
+
+.switch input:checked ~ label i:before { /* On/off */
+    content: "on";
+    right: 115%;
+    color: #82a06a;
+    text-shadow: 0 1px 0 #afcb9b, 0 -1px 0 #6b8659;
+}
+</style>
+
+<body onload="init()">
+<table align="center">
+<tr><td>
+<canvas id="canvas" width="200" height="200">
+        이 브라우저는 캔버스를 지원하지 않습니다.
+</canvas>
+</tr></td>
+</table>
+<table align="center">
+<tr><td>
+<div class="switch">
+
+<form name="chkbox">
+<input name="btn_chk" type="checkbox" value="" id="btn_chk" onclick="test()">
+<label><i></i></label>
+</form>
+
+</div>
+</tr></td>
+</table>
+</body>
+</html>
